@@ -65,7 +65,7 @@ app.get('/movie-search', (req, res) => {
 
 app.get('/login', (req, res) => {
     res.render('login', {
-        title : 'Connexion'
+        title : 'Espace membre'
     });
 });
 

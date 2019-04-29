@@ -12,7 +12,7 @@
 		<div class="central">
 			<h1><%= title %></h1>
 			<br>
-			<div>
+			<div id="login">
 				<form>
 					<legend>Veuillez saisir vos identifiants</legend>
 					<label for="email">email</label>
@@ -22,6 +22,12 @@
 					<button type="submit">connexion</button>
 				</form>
 			</div>
+
+			<div id="profile" style="display: none">
+				<button id="disconnectBtn">déconnexion</button>
+				<button id="display-payload">voir le payload</button>
+				<div id="decoded-payload"></div>
+			</div>
 		</div>
 
 		<footer>
@@ -30,6 +36,20 @@
 		<script>
 			var form = document.querySelector('form');
 			form.addEventListener("submit", loginUser);	
+
+
+			var disconnectBtn = document.querySelector('#disconnectBtn');
+			disconnectBtn.addEventListener('click', disconnect);
+			var connectionLinkArea = document.querySelector('#connectionLink');
+
+			var displayPayloadBtn = document.querySelector('#display-payload');
+			displayPayloadBtn.addEventListener('click', displayPayload);
+
+			var loginAera = document.querySelector('#login');
+			var profileAera = document.querySelector('#profile');
+			handleFormDisplay();
+
+
 			function loginUser(event) {				
                 loginUserWithXHR(event);
 			}	
@@ -45,7 +65,8 @@
 				xhr.onreadystatechange = function() {//Call a function when the state changes.
 					if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
                         let token = xhr.response;
-                        localStorage.setItem('token', token);
+						localStorage.setItem('token', token);
+						switchToLoggedinMode();
 						form.reset();
 					}
 				}				
@@ -53,6 +74,48 @@
 				var password = document.getElementById('password').value;
 				var payLoad = "email=" + email + "&" + "password=" + password; 
 				xhr.send(payLoad); 				
+			}
+
+			function handleFormDisplay() {
+				if(localStorage.getItem('token')) {
+					switchToLoggedinMode();
+				} else{
+					switchToLoggedOutMode();
+				}
+			}
+
+			function switchToLoggedinMode() {
+				loginAera.style.display = 'none';
+				profileAera.style.display = 'block';
+				connectionLinkArea.innerHTML = '<a href="/login">déconnexion</a>';
+			}
+
+			function switchToLoggedOutMode() {
+				loginAera.style.display = 'block';
+				profileAera.style.display = 'none';
+				connectionLinkArea.innerHTML = '<a href="/login">connexion</a>';
+			}
+
+
+			function displayPayload() {
+				var payload = parseJwt();
+				var decodedPayloadDiv = document.querySelector('#decoded-payload');
+				decodedPayloadDiv.innerHTML = `<pre> ${JSON.stringify(payload)}  </pre>`;
+			}
+
+			function parseJwt() {
+				var tokenFromStorage = localStorage.getItem('token');
+				if (tokenFromStorage) {
+					var base64Payload = tokenFromStorage.split('.')[1];
+					return JSON.parse(window.atob(base64Payload));
+				} else {
+					return 'not token to parse';
+				}
+			} 
+
+			function disconnect() {
+				switchToLoggedOutMode();
+				localStorage.removeItem('token');
 			}
 		</script>
 	</body>
