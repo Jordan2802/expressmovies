@@ -1,7 +1,7 @@
 <hr>
 <p> Copyright &copy; 2017 Codeconcept</p>
 <script>
-    // equivalent to $(document).ready()
+    // equivalent to $(document).query()
     // http://stackoverflow.com/questions/2304941/what-is-the-non-jquery-equivalent-of-document-ready
     (function(exports, d) {
         function domReady(fn, context) {
@@ -20,7 +20,6 @@
         }
         exports.domReady = domReady;
     })(window, document);
-    
     domReady(function() {
         console.log('DOM is ready :)');
         
